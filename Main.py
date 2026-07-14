@@ -1,17 +1,29 @@
 from data_collector import download_market_data
 from option_data_collector import get_option_chain
+
+from indicators import calculate_indicators
+from support_resistance import calculate_support_resistance
+
 from option_analysis import calculate_option_metrics
 from trend_engine import detect_trend
 from trade_engine import decide_trade
+
+from risk_engine import evaluate_trade
+
 from claude_prompt import create_claude_prompt
+
 
 
 def run_analysis():
 
-    print("Starting Bank Nifty AI Analyst...")
+    print(
+        "Starting Bank Nifty AI Analyst..."
+    )
 
 
-    # 1. Collect market data
+    # -------------------------
+    # Market Data
+    # -------------------------
 
     market_data = download_market_data()
 
@@ -19,14 +31,35 @@ def run_analysis():
     bank_nifty = market_data["BANKNIFTY"]
 
 
-    latest = bank_nifty.iloc[-1]
+    current_price = float(
+        bank_nifty["Close"].iloc[-1]
+    )
 
 
-    current_price = latest["Close"]
+
+    # -------------------------
+    # Indicators
+    # -------------------------
+
+    indicator_df, indicators = calculate_indicators(
+        bank_nifty
+    )
 
 
 
-    # 2. Option Chain
+    # -------------------------
+    # Support Resistance
+    # -------------------------
+
+    levels = calculate_support_resistance(
+        bank_nifty
+    )
+
+
+
+    # -------------------------
+    # Option Chain
+    # -------------------------
 
     option_chain = get_option_chain(
         "BANKNIFTY"
@@ -49,28 +82,27 @@ def run_analysis():
 
 
 
-    # 3. Prepare trend data
+    # -------------------------
+    # Trend
+    # -------------------------
 
-    # Temporary placeholder
-    # Will connect indicators next
-
-    trend_result = {
-
-        "Trend": "Unknown"
-
-    }
+    trend = detect_trend(
+        indicators
+    )
 
 
 
-    # 4. Trade decision
+    # -------------------------
+    # Risk
+    # -------------------------
 
-    trade = decide_trade(
+    risk = evaluate_trade(
 
-        trend_result["Trend"],
+        trend["Trend"],
 
         option_result["Option Bias"],
 
-        0,
+        80,
 
         False,
 
@@ -80,28 +112,52 @@ def run_analysis():
 
 
 
-    # 5. Create Claude prompt
+    # -------------------------
+    # Trade Decision
+    # -------------------------
+
+    trade = decide_trade(
+
+        trend["Trend"],
+
+        option_result["Option Bias"],
+
+        risk["Score"],
+
+        False,
+
+        False
+
+    )
+
+
+
+    # -------------------------
+    # Claude Prompt
+    # -------------------------
 
     prompt = create_claude_prompt(
 
         market=current_price,
 
-        trend=trend_result,
+        trend=trend,
 
-        indicators="Pending",
+        indicators=indicators,
 
-        levels="Pending",
+        levels=levels,
 
         option_data=option_result,
 
         trade=trade,
 
-        risk_data="Pending"
+        risk_data=risk
 
     )
 
 
-    print("\n========== CLAUDE ANALYSIS ==========")
+    print(
+        "\n========== AI ANALYSIS =========="
+    )
 
     print(prompt)
 
