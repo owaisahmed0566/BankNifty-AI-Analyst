@@ -1,116 +1,45 @@
-def generate_report(
-    market,
-    indicators,
-    levels,
-    option_data,
-    risk
-):
+def generate_report(data):
 
-    report = []
+    print("""
+==============================
+BANK NIFTY AI ANALYST REPORT
+==============================
 
-
-    report.append(
-        "===== BANK NIFTY AI ANALYSIS ====="
-    )
+Market:
+""", data["Market"])
 
 
-    report.append(
-        f"Market: {market}"
-    )
+    print("""
+
+Trend:
+""", data["Trend"])
 
 
-    report.append(
-        "\n--- Technical Analysis ---"
-    )
+    print("""
+
+Support / Resistance:
+""", data["Levels"])
 
 
-    report.append(
-        f"RSI: {indicators.get('RSI')}"
-    )
+    print("""
 
-    report.append(
-        f"EMA Trend: {indicators.get('Trend')}"
-    )
-
-    report.append(
-        f"VWAP Position: {indicators.get('VWAP')}"
-    )
+Option Analysis:
+""", data["Options"])
 
 
-    report.append(
-        "\n--- Support Resistance ---"
-    )
+    print("""
+
+Decision:
+""", data["Trade"])
 
 
-    for key, value in levels.items():
+    print("""
 
-        report.append(
-            f"{key}: {value}"
-        )
+Risk:
 
-
-    report.append(
-        "\n--- Option Analysis ---"
-    )
+""", data["Risk"])
 
 
-    for key, value in option_data.items():
-
-        report.append(
-            f"{key}: {value}"
-        )
-
-
-    report.append(
-        "\n--- Risk Engine ---"
-    )
-
-
-    report.append(
-        f"Decision: {risk['Decision']}"
-    )
-
-
-    report.append(
-        f"Confidence Score: {risk['Score']}%"
-    )
-
-
-    report.append(
-        "\nReasons:"
-    )
-
-
-    for reason in risk["Reasons"]:
-
-        report.append(
-            f"✔ {reason}"
-        )
-
-
-    report.append(
-        "\nWarnings:"
-    )
-
-
-    for warning in risk["Warnings"]:
-
-        report.append(
-            f"⚠ {warning}"
-        )
-
-
-    report.append(
-        "\n=============================="
-    )
-
-
-    return "\n".join(report)
-
-
-
-if __name__ == "__main__":
-
-    print(
-        "Report Generator Ready"
-    )
+    print("""
+==============================
+""")
