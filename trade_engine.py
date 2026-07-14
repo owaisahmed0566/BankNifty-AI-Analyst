@@ -1,81 +1,51 @@
 def decide_trade(
     trend,
     option_bias,
-    risk_score,
-    near_support,
-    near_resistance
+    risk_score
 ):
-
-    decision = "WAIT"
-
-    reasons = []
-
-
-    # Bullish setup
 
     if (
         trend == "Bullish"
         and option_bias == "Bullish"
-        and risk_score >= 80
+        and risk_score >= 70
     ):
 
-        if near_support:
+        return {
 
-            decision = "BUY CALL"
+            "Decision":
+            "BUY CALL",
 
-            reasons.append(
-                "Bullish confirmation near support"
-            )
+            "Reason":
+            "Trend and options agree"
 
-        else:
+        }
 
-            reasons.append(
-                "Bullish but not at ideal entry zone"
-            )
-
-
-    # Bearish setup
 
     elif (
         trend == "Bearish"
         and option_bias == "Bearish"
-        and risk_score >= 80
+        and risk_score >=70
     ):
 
-        if near_resistance:
+        return {
 
-            decision = "BUY PUT"
+            "Decision":
+            "BUY PUT",
 
-            reasons.append(
-                "Bearish confirmation near resistance"
-            )
+            "Reason":
+            "Bearish confirmation"
 
-        else:
-
-            reasons.append(
-                "Bearish but entry zone not confirmed"
-            )
+        }
 
 
     else:
 
-        reasons.append(
+        return {
+
+            "Decision":
+            "NO TRADE",
+
+            "Reason":
             "Conditions not strong enough"
-        )
 
-
-    return {
-
-        "Decision": decision,
-
-        "Reasons": reasons
-
-    }
-
-
-
-if __name__ == "__main__":
-
-    print(
-        "Trade Engine Ready"
-    )
+        }
