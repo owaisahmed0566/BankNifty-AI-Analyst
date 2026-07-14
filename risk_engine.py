@@ -1,9 +1,9 @@
 def evaluate_trade(
     trend,
     option_bias,
-    rsi,
-    near_resistance,
-    near_support
+    indicators,
+    levels,
+    current_price
 ):
 
     score = 0
@@ -11,91 +11,88 @@ def evaluate_trade(
     warnings = []
 
 
-    # Trend check
+    # Trend confirmation
 
     if trend == "Bullish":
+
         score += 25
-        reasons.append("Trend is bullish")
+        reasons.append(
+            "Trend supports bullish direction"
+        )
 
     elif trend == "Bearish":
+
         score += 25
-        reasons.append("Trend is bearish")
+        reasons.append(
+            "Trend supports bearish direction"
+        )
 
     else:
-        warnings.append("No clear trend")
+
+        warnings.append(
+            "No clear market trend"
+        )
 
 
     # Option confirmation
 
     if option_bias == trend:
+
         score += 25
         reasons.append(
-            "Option data confirms trend"
+            "Option chain confirms trend"
         )
 
     else:
+
         warnings.append(
-            "Option data conflict"
+            "Option chain conflicts with trend"
         )
 
 
-    # RSI check
+    # Momentum check
 
-    if 40 <= rsi <= 70:
+    rsi = indicators.get("RSI",0)
+
+
+    if 45 <= rsi <= 65:
+
         score += 15
+
         reasons.append(
-            "RSI in healthy zone"
+            "Momentum is acceptable"
         )
 
-    elif rsi > 70:
+    else:
+
         warnings.append(
-            "Market may be overbought"
-        )
-
-
-    # Support resistance risk
-
-    if near_resistance:
-        warnings.append(
-            "Price near resistance"
-        )
-
-        score -= 10
-
-
-    if near_support:
-        score += 10
-        reasons.append(
-            "Price near support"
+            "Momentum is weak or extreme"
         )
 
 
     # Final decision
 
-    if score >= 80:
+    if score >= 70:
 
-        decision = "APPROVED"
+        decision = "LOW RISK"
+
+    elif score >= 50:
+
+        decision = "MEDIUM RISK"
 
     else:
 
-        decision = "REJECTED"
-
+        decision = "HIGH RISK"
 
 
     return {
 
         "Score": score,
 
-        "Decision": decision,
+        "Risk": decision,
 
         "Reasons": reasons,
 
         "Warnings": warnings
 
     }
-
-
-
-if __name__ == "__main__":
-
-    print("Risk Engine Ready")
