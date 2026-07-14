@@ -2,40 +2,49 @@ import yfinance as yf
 from datetime import datetime
 
 
-def get_market_data():
+def download_market_data():
 
     symbols = {
         "NIFTY50": "^NSEI",
-        "BANKNIFTY": "^NSEBANK"
+        "BANKNIFTY": "^NSEBANK",
+        "INDIAVIX": "^INDIAVIX"
     }
 
     market_data = {}
 
     for name, symbol in symbols.items():
 
-        data = yf.download(
-            symbol,
-            period="5d",
-            interval="5m",
-            progress=False
-        )
+        try:
 
-        latest = data.iloc[-1]
+            df = yf.download(
+                symbol,
+                period="1mo",
+                interval="5m",
+                progress=False
+            )
 
-        market_data[name] = {
-            "price": float(latest["Close"]),
-            "high": float(latest["High"]),
-            "low": float(latest["Low"]),
-            "volume": int(latest["Volume"])
-        }
+            df.dropna(inplace=True)
 
-    market_data["time"] = str(datetime.now())
+            market_data[name] = df
+
+
+        except Exception as e:
+
+            market_data[name] = {
+                "error": str(e)
+            }
+
 
     return market_data
 
 
+
 if __name__ == "__main__":
 
-    result = get_market_data()
+    data = download_market_data()
 
-    print(result)
+    for market, df in data.items():
+
+        print("\n", market)
+
+        print(df.tail())
