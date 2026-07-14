@@ -1,50 +1,102 @@
-import yfinance as yf
-from datetime import datetime
+import requests
+import pandas as pd
 
 
-def download_market_data():
+def get_option_chain(symbol="BANKNIFTY"):
 
-    symbols = {
-        "NIFTY50": "^NSEI",
-        "BANKNIFTY": "^NSEBANK",
-        "INDIAVIX": "^INDIAVIX"
+    url = (
+        "https://www.nseindia.com/api/option-chain-indices"
+        f"?symbol={symbol}"
+    )
+
+
+    headers = {
+
+        "User-Agent":
+        "Mozilla/5.0",
+
+        "Accept":
+        "application/json"
+
     }
 
-    market_data = {}
 
-    for name, symbol in symbols.items():
-
-        try:
-
-            df = yf.download(
-                symbol,
-                period="1mo",
-                interval="5m",
-                progress=False
-            )
-
-            df.dropna(inplace=True)
-
-            market_data[name] = df
+    session = requests.Session()
 
 
-        except Exception as e:
+    try:
 
-            market_data[name] = {
-                "error": str(e)
-            }
+        response = session.get(
+            url,
+            headers=headers,
+            timeout=10
+        )
 
 
-    return market_data
+        data = response.json()
+
+
+        records = []
+
+
+        for item in data["records"]["data"]:
+
+            strike = item["strikePrice"]
+
+
+            if "CE" in item:
+
+                records.append({
+
+                    "Strike": strike,
+
+                    "Type": "CE",
+
+                    "OI":
+                    item["CE"]["openInterest"],
+
+                    "Change_OI":
+                    item["CE"]["changeinOpenInterest"]
+
+                })
+
+
+            if "PE" in item:
+
+                records.append({
+
+                    "Strike": strike,
+
+                    "Type": "PE",
+
+                    "OI":
+                    item["PE"]["openInterest"],
+
+                    "Change_OI":
+                    item["PE"]["changeinOpenInterest"]
+
+                })
+
+
+        return pd.DataFrame(records)
+
+
+
+    except Exception as e:
+
+
+        print(
+            "Option chain error:",
+            e
+        )
+
+
+        return None
 
 
 
 if __name__ == "__main__":
 
-    data = download_market_data()
+    chain = get_option_chain()
 
-    for market, df in data.items():
-
-        print("\n", market)
-
-        print(df.tail())
+    print(chain.head())
